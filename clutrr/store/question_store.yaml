@@ -1,0 +1,13 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+# All rights reserved.
+#
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
+#
+
+relational: [
+  "How is e_1 related to e_2 ?",
+  "Fill in the blanks : e_2 is e_1 's _",
+  "Who is e_2 from the point of relation of e_1 ?",
+]
+

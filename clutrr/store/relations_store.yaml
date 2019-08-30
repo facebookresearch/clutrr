@@ -1,0 +1,232 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+# All rights reserved.
+#
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
+#
+
+# file to contain placeholders and relation keywords
+
+child:
+  male:
+    rel: son
+    p: [
+      e_2 is a son of e_1,
+      e_1 has a son called e_2,
+      e_2 is e_1's son
+    ]
+  female:
+    rel: daughter
+    p: [
+      e_2 is a daughter of e_1,
+      e_1 has a daughter called e_2,
+      e_2 is e_1's daughter
+    ]
+
+inv-child:
+  male:
+    rel: father
+    p: [
+      e_2 is the father of e_1,
+      e_2 is e_1's father
+    ]
+    not : [
+      e_2 is not the mother of e_1 but one of the parent,
+      e_2 is e_1's parent but not the mother
+    ]
+  female:
+    rel: mother
+    p: [
+      e_2 is the mother of e_1,
+      e_2 is e_1's mother
+    ]
+    not: [
+      e_2 is not the father of e_1 but one of the parent,
+      e_2 is e_1's parent but not the father
+    ]
+
+SO:
+  male:
+    rel: husband
+    p: [
+      e_2 is the husband of e_1,
+      The husband of e_1 is e_2,
+      e_2 is e_1's husband
+    ]
+    not: [
+      e_2 is the significant other of e_1 but not the wife,
+
+    ]
+  female:
+    rel: wife
+    p: [
+      e_2 is the wife of e_1,
+      e_1 has a wife who is e_2,
+      e_2 is e_1's wife
+    ]
+
+sibling:
+  male:
+    rel: brother
+    p: [
+      e_2 is a brother of e_1,
+      e_1 has a brother named e_2,
+      e_2 is e_1's brother
+    ]
+  female:
+    rel: sister
+    p: [
+      e_2 is a sister of e_1,
+      e_1 has a sister named e_2,
+      e_2 is e_1's sister
+    ]
+
+grand:
+  male:
+    rel: grandson
+    p: [
+      e_2 is the grandson of e_1,
+      e_1 has a grandson who is e_2,
+      e_2 is e_1's grandson
+    ]
+  female:
+    rel: granddaughter
+    p: [
+      e_2 is the granddaughter of e_1,
+      e_1 has a granddaughter who is e_2,
+      e_2 is e_1's granddaughter
+    ]
+
+inv-grand:
+  male:
+    rel: grandfather
+    p: [
+      e_2 is the grandfather of e_1,
+      e_2 is e_1's grandfather
+    ]
+  female:
+    rel: grandmother
+    p: [
+      e_2 is the grandmother of e_1,
+      e_2 is e_1's grandmother
+    ]
+
+in-law:
+  male:
+    rel: son-in-law
+    p: [
+      e_2 is the son-in-law of e_1,
+      e_1 has a son-in-law who is e_2
+    ]
+  female:
+    rel: daughter-in-law
+    p: [
+      e_2 is the daughter-in-law of e_1,
+      e_1 has a daughter-in-law who is e_2
+    ]
+
+inv-in-law:
+  male:
+    rel: father-in-law
+    p: [
+      e_2 is the father-in-law of e_1,
+      e_2 is e_1's father-in-law
+    ]
+  female:
+    rel: mother-in-law
+    p: [
+      e_2 is the mother-in-law of e_1,
+      e_2 is e_1's mother-in-law
+    ]
+
+sibling-in-law :
+  male:
+    rel: brother-in-law
+    p: [
+      e_2 is the brother-in-law of e_1,
+      e_2 is e_1's brother-in-law
+    ]
+  female:
+    rel: sister-in-law
+    p: [
+      e_2 is the sister-in-law of e_1,
+      e_2 is e_1's sister-in-law
+    ]
+
+un:
+  male:
+    rel: nephew
+    p: [
+      e_2 is the nephew of e_1,
+      e_2 is e_1's nephew
+    ]
+  female:
+    rel: neice
+    p: [
+      e_2 is the niece of e_1,
+      e_2 is e_1's niece
+    ]
+
+inv-un :
+  male:
+    rel: uncle
+    p: [
+      e_2 is the uncle of e_1,
+      e_2 is e_1's uncle
+    ]
+  female:
+    rel: aunt
+    p: [
+      e_2 is the aunt of e_1,
+      e_2 is e_1's aunt
+    ]
+
+no-relation:
+  male:
+    rel: no-relation
+    p: [
+      e_1 has no-relation with e_2,
+      e_2 has no-relation with e_1
+    ]
+  female:
+    rel: no-relation
+    p: [
+      e_1 has no-relation with e_2,
+      e_2 has no-relation with e_1
+    ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

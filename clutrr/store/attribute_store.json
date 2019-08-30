@@ -1,0 +1,60 @@
+{
+    "school": {
+        "options": [
+            "McGill","UBC","UofToronto","MIT","Stanford","UCB","Harvard","Oxford"
+        ],
+        "placeholders":[
+            "e_x is an alumni of attr_x",
+            "e_x graduated from attr_x about some time ago",
+            "e_x is a proud alumni of attr_x"
+        ]
+    },
+    "location_born": {
+        "options": [
+            "Montreal","Toronto","Edmonton","Vancouver"
+        ],
+        "placeholders":[
+            "e_x was born in attr_x",
+            "e_x is a native of attr_x",
+            "attr_x is the place where e_x was born"
+        ]
+    },
+    "social_media_active": {
+        "options": [true, false],
+        "placeholders":[
+            "e_x is very active on social media",
+            "e_x is not that active on social media"
+        ]
+    },
+    "social_media_preferred": {
+        "options": ["Facebook","Twitter","Reddit"],
+        "placeholders":[
+            "e_x spends a lot of time on attr_x",
+            "e_x loves browsing attr_x"
+        ]
+    },
+    "political_views": {
+        "options": ["Democratic","Republican"],
+        "placeholders":[
+            "e_x once attended the attr_x convention",
+            "e_x strongly believes in attr_x political views",
+            "e_x votes for the attr_x political party"
+        ]
+    },
+    "hobby": {
+        "options": ["drawing", "dancing","cooking"],
+        "placeholders":[
+            "e_x is into attr_x",
+            "e_x loves to do attr_x"
+        ]
+    },
+    "sport": {
+        "options": ["soccer", "cricket", "hockey"],
+        "placeholders":[
+            "e_x loves to play attr_x",
+            "e_x follows attr_x",
+            "e_x is into attr_x",
+            "e_x watches attr_x a lot"
+        ]
+    }
+}
