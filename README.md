@@ -172,6 +172,7 @@ If our work is useful for your research, consider citing it using the following 
 ## Join the CLUTRR community
 
 * Website: https://www.cs.mcgill.ca/~ksinha4/clutrr/
+* Blog: https://www.cs.mcgill.ca/~ksinha4/introducing-clutrr/
 
 See the [CONTRIBUTING](CONTRIBUTING.md) file for how to help out.
 
