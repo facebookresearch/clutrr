@@ -4,8 +4,9 @@
 
 A benchmark dataset generator to test relational reasoning on text
 
-Code for generating data for our paper ["CLUTRR: A Diagnostic Benchmark for Inductive Reasoning from Text"](https://arxiv.org/abs/1908.06177)
+Code for generating data for our paper ["CLUTRR: A Diagnostic Benchmark for Inductive Reasoning from Text"](https://arxiv.org/abs/1908.06177) at EMNLP 2019
 
+* Blog: https://www.cs.mcgill.ca/~ksinha4/introducing-clutrr/
 
 ### Dependencies
 
@@ -172,7 +173,6 @@ If our work is useful for your research, consider citing it using the following 
 ## Join the CLUTRR community
 
 * Website: https://www.cs.mcgill.ca/~ksinha4/clutrr/
-* Blog: https://www.cs.mcgill.ca/~ksinha4/introducing-clutrr/
 
 See the [CONTRIBUTING](CONTRIBUTING.md) file for how to help out.
 
