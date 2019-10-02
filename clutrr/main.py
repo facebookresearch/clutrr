@@ -19,12 +19,18 @@ import os
 import json
 import shutil
 import sys
+import nltk
 from nltk.tokenize import word_tokenize
 import pickle as pkl
 import requests
 import hashlib
 import zipfile
 
+# check if nltk.punkt is installed
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
 
 logPath = '../logs/'
 fileName = 'data'
@@ -365,8 +371,6 @@ class Clutrr:
                 zip_ref.extractall(os.path.join(base_path, 'clutrr'))
         # set args
         self.args.template_file = "cleaned_placeholders/amt_placeholders_clean"
-
-
 
 
 if __name__ == '__main__':
