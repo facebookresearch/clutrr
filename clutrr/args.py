@@ -37,6 +37,7 @@ def get_args(command=None):
     parser.add_argument("--rules_store", default="rules_store.yaml", type=str, help='Rules store')
     parser.add_argument("--relations_store", default="relations_store.yaml", type=str, help='Relations store')
     parser.add_argument("--attribute_store", default="attribute_store.json", type=str, help='Attributes store')
+    parser.add_argument("--question_store", default="question_store.yaml", type=str, help='Question store')
     # task
     parser.add_argument("--train_tasks", default="1.3", type=str, help='Define which task to create dataset for, including the relationship length, comma separated')
     parser.add_argument("--test_tasks", default="1.3", type=str, help='Define which tasks including the relation lengths to test for, comma separaated')

@@ -138,7 +138,7 @@ class Puzzle:
     def generate_text(self, stype='story', combination_length=1, templator:Templator=None, edges=None):
         """
 
-        :param stype: can be story or fact
+        :param stype: can be story, fact, target, or query
         :param combination_length: the max length of combining the edges for text replacement
         :param templator: templator class
         :param edges: if provided, use these edges instead of stypes
@@ -152,6 +152,10 @@ class Puzzle:
                 edges_to_convert = copy.copy([fact.fact_edges for fact in self.facts])
                 edges_to_convert = [y for x in edges_to_convert for y in x]
             elif stype == 'target':
+                # derive the relation (solution) from the target edge
+                edges_to_convert = [copy.copy(self.target_edge)]
+            elif stype == 'query':
+                # derive the question from the target edge
                 edges_to_convert = [copy.copy(self.target_edge)]
             else:
                 raise NotImplementedError("stype not implemented")

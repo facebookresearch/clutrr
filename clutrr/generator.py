@@ -54,6 +54,14 @@ def generate_rows(args, store, task_name, split=0.8, prev_patterns=None):
         templatorClass = TemplatorSynthetic
         train_templates = synthetic_templates_per_rel
         test_templates = synthetic_templates_per_rel
+
+    # Build a mapping from ANY relation to the SAME list of sentences for asking queries
+    query_templates = {}
+    for key, val in store.relations_store.items():
+        for gender, gv in val.items():
+            query_templates[gv['rel']] = store.question_store['relational']
+    query_templator_class = TemplatorSynthetic
+
     pb = tqdm(total=args.num_rows)
     num_stories = args.num_rows
     stories_left = num_stories
@@ -172,6 +180,12 @@ def generate_rows(args, store, task_name, split=0.8, prev_patterns=None):
         clean_story = ' '.join(story_text)
         target_text = puzzle.generate_text(stype='target', combination_length=1, templator=templator)
 
+        # Build query text
+        query_templator = query_templator_class(templates=query_templates, family=puzzle.anc.family_data)
+        query_text = puzzle.generate_text(stype='query', combination_length=1, templator=query_templator)
+        query_text = ' '.join(query_text)
+        query_text = query_text.replace('?.', '?')  # remove trailing '.'
+
         story_key_edges = puzzle.get_story_relations()
         puzzle.convert_node_ids(stype='story')
         puzzle.convert_node_ids(stype='fact')
@@ -180,7 +194,7 @@ def generate_rows(args, store, task_name, split=0.8, prev_patterns=None):
 
         genders = puzzle.get_name_gender_string()
 
-        rows.append([pid, story, puzzle.query_text, '', puzzle.target_edge_rel, target_text,
+        rows.append([pid, story, puzzle.query_text, query_text, puzzle.target_edge_rel, target_text,
                      clean_story, puzzle.proof_trace, puzzle.relation_comb, task_name, story_keys_changed_ids,
                      story_key_edges, query_edge, genders, '', puzzle.story_sort_dict, task_split])
         pb.update(1)

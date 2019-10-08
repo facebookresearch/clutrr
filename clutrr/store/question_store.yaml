@@ -8,6 +8,9 @@
 relational: [
   "How is e_1 related to e_2 ?",
   "Fill in the blanks : e_2 is e_1 's _",
+  "How are e_1 and e_2 related to each other ?",
   "Who is e_2 from the point of relation of e_1 ?",
+  "For e_1, who is e_2 ?",
+  "What is the family connection between e_1 and e_2 ?",
 ]
 
