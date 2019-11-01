@@ -334,6 +334,9 @@ class Clutrr:
         """
         args.memory = 0.5
         args.output += '_task7'
+        args.noise_support = True
+        args.noise_disconnected = True
+        args.noise_disconnected = True
         return args
 
     def setup(self):
