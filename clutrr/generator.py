@@ -172,7 +172,7 @@ def generate_rows(args, store, task_name, split=0.8, prev_patterns=None):
         clean_story = ' '.join(story_text)
         target_text = puzzle.generate_text(stype='target', combination_length=1, templator=templator)
 
-        story_key_edges = puzzle.get_story_relations()
+        story_key_edges = puzzle.get_story_relations(stype='story') + puzzle.get_story_relations(stype='fact')
         puzzle.convert_node_ids(stype='story')
         puzzle.convert_node_ids(stype='fact')
         story_keys_changed_ids = puzzle.get_sorted_story_edges(stype='story') + puzzle.get_sorted_story_edges(stype='fact')
