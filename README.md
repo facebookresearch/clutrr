@@ -64,6 +64,19 @@ To use the templates, pass `--use_mturk_template` flag and location of the templ
 the maximum length k to use to replace the sentences. The script auto-downloads our collected and cleaned
 template files from the server using `setup()` method in main.py.
 
+## Transductive and Inductive Setting
+
+CLUTRR provides both transductive and inductive setting for relational reasoning. In the transductive setting, the relation patterns encountered in the training set is the same as in the test set. While this setup is not interesting, it can be used to perform basic sanity checks of the model. In the inductive setting, the relation patterns are split 80-20 in training and testing. Furthermore, with the ability to split AMT placeholders, CLUTRR provides 4 scenarios to play with using the correct flags:
+
+| Setup | Flags | Description |
+| --- | ------ | ----- |
+| (1) | (default)                  | same pattern in train & test, same AMT placeholder = EASY as data leak |
+| (2) | `--template_split`           | same pattern in train & test, different AMT placeholder = Transductive, medium difficulty |
+| (3) | `--holdout`                  | different pattern in train & test, same AMT placeholder = Inductive, but still could be easy for language models to exploit on the syntax |
+| (4) | `--template_split --holdout` | different pattern in train & test, different AMT placeholder = Inductive, and hardest setup |
+
+Thanks to [@NicolasAG](https://github.com/NicolasAG) for adding this information in the README.
+
 ## Rules
 
 We create an ideal simple kinship world, which is derived from a set of _clauses_ or rules.
