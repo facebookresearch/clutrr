@@ -1,0 +1,9 @@
+data_loc: cluttr_data
+seed: 40
+world_id: 0
+template_type: synthetic # synthetic or amt
+template_folder: store/templates # template folder which should have three files, train.json, valid.json, test.json. In case of synthetic, only train.json is required
+gender_map: store/relations_store.yaml 
+names_url: https://github.com/PhantomInsights/baby-names-analysis/raw/master/data/data.csv
+names_file: names.csv
+num_names: 1000 # number of names to consider for male and female names
