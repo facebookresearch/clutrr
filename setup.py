@@ -10,10 +10,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='clutrr',
-    version='1.0.0',
-    description='Compositional Language Understanding with Text-based Relational Reasoning',
-    packages=find_packages(exclude=(
-        'data', 'mturk')),
+    name="clutrr",
+    version="1.1.0",
+    description="Compositional Language Understanding with Text-based Relational Reasoning",
+    packages=find_packages(exclude=("data", "mturk")),
     include_package_data=True,
 )

@@ -1,4 +1,4 @@
-data_loc: /Users/koustuvs/mlp/cluttr_data
+data_loc: /Users/koustuvs/data
 seed: 42
 world_id: 0
 template_type: amt # synthetic or amt

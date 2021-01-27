@@ -1,5 +1,5 @@
 #!/bin/bash
-DATA_LOC=/Users/koustuvs/mlp/cluttr_data
+DATA_LOC=/path/to/data
 NUM_TRAIN=1000
 NUM_VALID=100
 NUM_TEST=100
