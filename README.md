@@ -6,168 +6,37 @@ A benchmark dataset generator to test relational reasoning on text
 
 Code for generating data for our paper ["CLUTRR: A Diagnostic Benchmark for Inductive Reasoning from Text"](https://arxiv.org/abs/1908.06177) at EMNLP 2019
 
-* Blog: https://www.cs.mcgill.ca/~ksinha4/introducing-clutrr/
-* Baselines: https://github.com/koustuvsinha/clutrr-baselines
+- Blog: https://www.cs.mcgill.ca/~ksinha4/introducing-clutrr/
+- Baselines: https://github.com/koustuvsinha/clutrr-baselines
 
 ### Dependencies
 
 - [pandas](https://pypi.org/project/pandas/) - to store and retrieve in csv
-- [names](https://pypi.org/project/names/) - to generate fancy names
 - [tqdm](https://pypi.org/project/tqdm/) - for fancy progressbars
+- [hydra](https://hydra.cc) - For config management
 
 ## Install
 
-`python setup.py develop`
+`pip install -r requirements.txt`
 
-## Tasks
+**Note**: Currently, CLUTRR is being updated to integrate [GLC](https://github.com/koustuvsinha/glc) in the develop branch (#9). This is a breaking change and hence it only supports clean graphs (devoid of noise) right now. In the following weeks this branch will be updated to replicate all of CLUTRR tasks. For the original full readme, please switch to the main branch.
 
-CLUTRR is highly modular and thus can be used for various probing tasks. Here we document the various types of tasks
-available and the corresponding config arguments to generate them. To
-run a task, refer the following table and run:
+## ChangeLog
 
-`python main.py --train_task <> --test_tasks <> <args>`
+### v1.1.0
 
-Where, `train_task` is in the form of `<task_id>.<relation_length>`, and `test_tasks` is a comma separated list of the same form. For eg:
-
-`python main.py --train_tasks 1.3 --test_tasks 1.3,1.4`
-
-You can provide general arguments as well, which are defined in the next section.
-
-| Task | Description                              |
-|------|------------------------------------------|
-|   1  | Basic family relations, free of noise   |
-|   2  | Family relations with supporting facts  |
-|   3  | Family relations with irrelevant facts  |
-|   4  | Family relations with disconnected facts |
-|   5  | Family relations with all facts (2-4)  |
-|   6  | Family relations - Memory task: retrieve the relations already defined in the text 
-|   7  | Family relations - Mix of Memory and Reasoning - 1 & 6 |   
-
-
-Generated data is stored in `data/` folder.
-i
-## Generalizability
-
-Each task mentioned above can be used for different length _k_ of the relations.
-For example, Task 1 can have a train set of k=3 and test set of k=4,5,6, etc. See the
-above section in how to provide such arguments quickly.
-
-
-## AMT Paraphrasing
-
-We collect paraphrases for relations k=1,2 and 3 from Amazon Mechanical Turk using [ParlAI](https://github.com/facebookresearch/parlai)
-MTurk interface. The collected paraphrases can be re-used as _templates_ to generate
-arbitrary large dataset in the above configurations. We will release the templates shortly here.
-
-To use the templates, pass `--use_mturk_template` flag and location of the template using 
-`--template_file` argument. The flag `--template_length` is optional and it governs
-the maximum length k to use to replace the sentences. The script auto-downloads our collected and cleaned
-template files from the server using `setup()` method in main.py.
-
-## Transductive and Inductive Setting
-
-CLUTRR provides both transductive and inductive setting for relational reasoning. In the transductive setting, the relation patterns encountered in the training set is the same as in the test set. While this setup is not interesting, it can be used to perform basic sanity checks of the model. In the inductive setting, the relation patterns are split 80-20 in training and testing. Furthermore, with the ability to split AMT placeholders, CLUTRR provides 4 scenarios to play with using the correct flags:
-
-| Setup | Flags | Description |
-| --- | ------ | ----- |
-| (1) | (default)                  | same pattern in train & test, same AMT placeholder = EASY as data leak |
-| (2) | `--template_split`           | same pattern in train & test, different AMT placeholder = Transductive, medium difficulty |
-| (3) | `--holdout`                  | different pattern in train & test, same AMT placeholder = Inductive, but still could be easy for language models to exploit on the syntax |
-| (4) | `--template_split --holdout` | different pattern in train & test, different AMT placeholder = Inductive, and hardest setup |
-
-Thanks to [@NicolasAG](https://github.com/NicolasAG) for adding this information in the README.
-
-## Rules
-
-We create an ideal simple kinship world, which is derived from a set of _clauses_ or rules.
-The rules are defined in [rules_store.yaml](clutrr/store/rules_store.yaml) file.
+- An example script is provided at `generate.sh`, which first calls the GLC module to generate graphs (which is added as a submodule), and then calls the `clutrr/generator_glc.py` script.
+- We are now moving to use [Hydra](https://hydra.cc) for config management (#10). CLUTRR specific config is present at `config.yaml`. GLC specific config is present in `glc/graph_config.yaml`.
+- We are deprecating the usage of `names` pip package in favour of the more comprehensive list https://github.com/PhantomInsights/baby-names-analysis.
+- Tests are provided for most functions (use `pytest`).
+- Output file fields will be documented in the next release.
 
 ## Usage
 
-To generate the simple setup on task 1, first cd into `clutrr/clutrr` folder, and run:
+To generate the graphs, change `DATA_LOC` path appropriately (full path), and run:
 
 ```
-python main.py --train_tasks 1.2 --test_tasks 1.2 --train_rows 500 --test_rows 10 --equal --holdout --use_mturk_template --data_name "Robust Reasoning - clean - AMT" --unique_test_pattern
-```
-
-Pre-generated datasets used in our paper [can be found here](https://drive.google.com/file/d/1SEq_e1IVCDDzsBIBhoUQ5pOVH5kxRoZF/view).
-
-#### CLI Usage
-
-```
-usage: main.py [-h] [--max_levels MAX_LEVELS] [--min_child MIN_CHILD]
-               [--max_child MAX_CHILD] [--p_marry P_MARRY] [--boundary]
-               [--output OUTPUT] [--rules_store RULES_STORE]
-               [--relations_store RELATIONS_STORE]
-               [--attribute_store ATTRIBUTE_STORE] [--train_tasks TRAIN_TASKS]
-               [--test_tasks TEST_TASKS] [--train_rows TRAIN_ROWS]
-               [--test_rows TEST_ROWS] [--memory MEMORY]
-               [--data_type DATA_TYPE] [--question QUESTION] [-v]
-               [-t TEST_SPLIT] [--equal] [--analyze] [--mturk] [--holdout]
-               [--data_name DATA_NAME] [--use_mturk_template]
-               [--template_length TEMPLATE_LENGTH]
-               [--template_file TEMPLATE_FILE] [--template_split]
-               [--combination_length COMBINATION_LENGTH]
-               [--output_dir OUTPUT_DIR] [--store_full_puzzles]
-               [--unique_test_pattern]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --max_levels MAX_LEVELS
-                        max number of levels
-  --min_child MIN_CHILD
-                        max number of children per node
-  --max_child MAX_CHILD
-                        max number of children per node
-  --p_marry P_MARRY     Probability of marriage among nodes
-  --boundary            Boundary in entities
-  --output OUTPUT       Prefix of the output file
-  --rules_store RULES_STORE
-                        Rules store
-  --relations_store RELATIONS_STORE
-                        Relations store
-  --attribute_store ATTRIBUTE_STORE
-                        Attributes store
-  --train_tasks TRAIN_TASKS
-                        Define which task to create dataset for, including the
-                        relationship length, comma separated
-  --test_tasks TEST_TASKS
-                        Define which tasks including the relation lengths to
-                        test for, comma separaated
-  --train_rows TRAIN_ROWS
-                        number of train rows
-  --test_rows TEST_ROWS
-                        number of test rows
-  --memory MEMORY       Percentage of tasks which are just memory retrieval
-  --data_type DATA_TYPE
-                        train/test
-  --question QUESTION   Question type. 0 -> relational, 1 -> yes/no
-  -v, --verbose         print the paths
-  -t TEST_SPLIT, --test_split TEST_SPLIT
-                        Testing split
-  --equal               Make sure each pattern is equal. Warning: Time
-                        complexity of generation increases if this flag is
-                        set.
-  --analyze             Analyze generated files
-  --mturk               prepare data for mturk
-  --holdout             if true, then hold out unique patterns in the test set
-  --data_name DATA_NAME
-                        Dataset name
-  --use_mturk_template  use the templating data for mturk
-  --template_length TEMPLATE_LENGTH
-                        Max Length of the template to substitute
-  --template_file TEMPLATE_FILE
-                        location of placeholders
-  --template_split      Split on template level
-  --combination_length COMBINATION_LENGTH
-                        number of relations to combine together
-  --output_dir OUTPUT_DIR
-                        output_dir
-  --store_full_puzzles  store the full puzzle data in puzzles.pkl file.
-                        Warning: may take considerable amount of disk space!
-  --unique_test_pattern
-                        If true, have unique patterns generated in the first
-                        gen, and then choose from it.
+./generate.sh
 ```
 
 ## Citation
@@ -186,10 +55,10 @@ If our work is useful for your research, consider citing it using the following 
 
 ## Join the CLUTRR community
 
-* Website: https://www.cs.mcgill.ca/~ksinha4/clutrr/
+- Website: https://www.cs.mcgill.ca/~ksinha4/clutrr/
 
 See the [CONTRIBUTING](CONTRIBUTING.md) file for how to help out.
 
 ## License
-CLUTRR is CC-BY-NC 4.0 (Attr Non-Commercial Inter.) licensed, as found in the LICENSE file.
 
+CLUTRR is CC-BY-NC 4.0 (Attr Non-Commercial Inter.) licensed, as found in the LICENSE file.
