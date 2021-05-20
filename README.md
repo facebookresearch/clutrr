@@ -184,9 +184,14 @@ If our work is useful for your research, consider citing it using the following 
 }
 ```
 
+## Papers using CLUTRR
+
+- Nicolas Gontier, Koustuv Sinha, Siva Reddy, Chris Pal, _Measuring Systematic Generalization in Neural Proof Generation with Transformers_ (NeurIPS 2020) [Paper](https://arxiv.org/abs/2009.14786) [Code & Data](https://github.com/NicolasAG/SGinPG)
+
 ## Join the CLUTRR community
 
 * Website: https://www.cs.mcgill.ca/~ksinha4/clutrr/
+* Using CLUTRR in your paper? Feel free to [send me an email](mailto:koustuv.sinha@mail.mcgill.ca) to include your paper in our README!
 
 See the [CONTRIBUTING](CONTRIBUTING.md) file for how to help out.
 
