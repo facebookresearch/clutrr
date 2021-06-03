@@ -168,6 +168,34 @@ def test_apply_template_on_edges():
     assert row["text_story"] == story
 
 
+def test_apply_template_on_edges_with_boundary():
+    set_seed(42)
+    args = Dict(
+        {
+            "template_type": "amt",
+            "gender_map": "clutrr/store/relations_store.yaml",
+            "template_folder": "clutrr/templates",
+            "num_names": 1000,
+            "names_file": "clutrr/names.csv",
+        }
+    )
+    templates = load_templates(args)
+    row = apply_template_on_edges(
+        args, test_data[0], templates["train"], name_boundary=True
+    )
+    assert "text_story" in row
+    assert "used_templates" in row
+    # Recompute the story and test
+    story = ""
+    for chosen_template, named_entities, gender_of_entities in row["used_templates"]:
+        fact = copy.deepcopy(chosen_template)
+        for ei, name in enumerate(named_entities):
+            xname = f"[{name}]"
+            fact = fact.replace(f"ENT_{ei}_{gender_of_entities[ei]}", xname)
+        story += fact + " "
+    assert row["text_story"] == story
+
+
 def test_validate_graphs():
     set_seed(42)
     test_data = [

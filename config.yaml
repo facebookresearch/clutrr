@@ -10,3 +10,4 @@ num_names: 1000 # number of names to consider for male and female names
 num_train: 500
 num_valid: 50
 num_test: 50
+use_name_boundary: True # adds a [ ] boundary surrounding the name

@@ -262,10 +262,20 @@ def sample_combination(
 
 
 def apply_template_on_edges(
-    args, data_row, templates, separator=" ", debug=False
+    args, data_row, templates, separator=" ", name_boundary=False, debug=False
 ) -> Dict[str, Any]:
     """
     Apply templates on the edges
+
+    Parameters
+    - args: Config
+    - data_row: Input data row
+    - templates: dictionary of templates
+    - separator: Sentence separator
+    - name_boundary: whether to add a "[]" boundary surrounding the names
+    - debug: Inspect method
+
+
     :Return: modified data_row
     """
     data_row = apply_gender(args, data_row)
@@ -286,7 +296,11 @@ def apply_template_on_edges(
         # save used templates for posterity
         used_templates.append((chosen_template, named_entities, gender_of_entities))
         for ei, name in enumerate(named_entities):
-            fact = fact.replace(f"ENT_{ei}_{gender_of_entities[ei]}", name)
+            if name_boundary:
+                xname = f"[{name}]"
+            else:
+                xname = name
+            fact = fact.replace(f"ENT_{ei}_{gender_of_entities[ei]}", xname)
         story += fact + separator
 
     data_row["text_story"] = story
@@ -308,7 +322,9 @@ def apply_templates(args, data_file, templates) -> List[Dict[str, Any]]:
     pb = tqdm(total=len(data_file))
     for row in data_file:
         new_row = copy.deepcopy(row)
-        new_row = apply_template_on_edges(args, new_row, templates)
+        new_row = apply_template_on_edges(
+            args, new_row, templates, name_boundary=args.use_name_boundary
+        )
         new_rows.append(new_row)
         pb.update(1)
     pb.close()

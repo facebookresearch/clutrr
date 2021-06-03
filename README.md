@@ -39,6 +39,14 @@ To generate the graphs, change `DATA_LOC` path appropriately (full path), and ru
 ./generate.sh
 ```
 
+## Tests
+
+Run the tests using `pytest`:
+
+```sh
+pytest clutrr
+```
+
 ## Citation
 
 If our work is useful for your research, consider citing it using the following bibtex:
