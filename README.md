@@ -187,6 +187,7 @@ If our work is useful for your research, consider citing it using the following 
 ## Papers using CLUTRR
 
 - Nicolas Gontier, Koustuv Sinha, Siva Reddy, Chris Pal, _Measuring Systematic Generalization in Neural Proof Generation with Transformers_ (NeurIPS 2020) [Paper](https://arxiv.org/abs/2009.14786) [Code & Data](https://github.com/NicolasAG/SGinPG)
+- Pasquale Minervini, Sebastian Riedel, Pontus Stenetorp, Edward Grefenstette, Tim Rocktäschel, _Learning Reasoning Strategies in End-to-End Differentiable Proving_ (ICML 2020) [Paper](https://arxiv.org/abs/2007.06477) [Code & Data](https://github.com/uclnlp/ctp)
 
 ## Join the CLUTRR community
 
