@@ -116,10 +116,6 @@ dmypy.json
 *.pkl
 **/*.pkl
 
-# CSV
-*.csv
-**/*.csv
-
 # data
 !data/.gikeep
 data/
