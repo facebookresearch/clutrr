@@ -11,3 +11,9 @@ num_train: 500
 num_valid: 50
 num_test: 50
 use_name_boundary: True # adds a [ ] boundary surrounding the name
+hydra:
+  job:
+    chdir: False
+defaults:
+  - hydra/hydra_logging: none
+  - hydra/job_logging: none

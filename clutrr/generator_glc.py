@@ -332,29 +332,38 @@ def apply_templates(args, data_file, templates) -> List[Dict[str, Any]]:
     return new_rows
 
 
+def load_csv_templates(loc) -> Dict[str, Any]:
+    """
+    Load csv templates and convert them to dict
+    """
+    df = pd.read_csv(loc)
+    template_store = {}
+    for i, row in df.iterrows():
+        if row["rel_comb"] not in template_store:
+            template_store[row["rel_comb"]] = {}
+        if row["gender_comb"] not in template_store[row["rel_comb"]]:
+            template_store[row["rel_comb"]][row["gender_comb"]] = []
+        if not row["ignore"]:
+            template_store[row["rel_comb"]][row["gender_comb"]].append(row["template"])
+    return template_store
+
+
 def load_templates(args) -> Dict[str, Any]:
     """
     Load the correct template based on the type
     """
     templates = {"train": {}, "valid": {}, "test": {}}
     cur_folder = get_current_folder()
+    template_dir = cur_folder / args.template_folder / args.template_type
     if args.template_type == "synthetic":
-        tp = json.load(
-            open(cur_folder / args.template_folder / args.template_type / "train.json")
-        )
+        tp = json.load(open(template_dir / "train.json"))
         templates["train"] = tp
         templates["valid"] = tp
         templates["test"] = tp
     elif args.template_type == "amt":
-        templates["train"] = json.load(
-            open(cur_folder / args.template_folder / args.template_type / "train.json")
-        )
-        templates["valid"] = json.load(
-            open(cur_folder / args.template_folder / args.template_type / "valid.json")
-        )
-        templates["test"] = json.load(
-            open(cur_folder / args.template_folder / args.template_type / "test.json")
-        )
+        templates["train"] = load_csv_templates(template_dir / "train.csv")
+        templates["valid"] = load_csv_templates(template_dir / "valid.csv")
+        templates["test"] = load_csv_templates(template_dir / "test.csv")
     else:
         raise AssertionError(f"template_type : {args.template_type} not supported")
     return templates
@@ -453,7 +462,7 @@ def subsample_graphs(
     return train_file, valid_file, test_file
 
 
-@hydra.main(config_name="../config")
+@hydra.main(config_name="config")
 def main(args: DictConfig):
     set_seed(args.seed)
     # Load files
