@@ -24,6 +24,7 @@ def pairwise(iterable):
     next(b, None)
     return zip(a, b)
 
+
 def prob_dist(rows):
     row_dict = {}
     for row in rows:
@@ -33,13 +34,14 @@ def prob_dist(rows):
     rel_probs = {k: (len(v) / len(rows)) for k, v in row_dict.items()}
     return rel_probs
 
+
 def split_train_test(args, rows):
     # split training testing
     r1 = prob_dist(rows)
     indices = range(len(rows))
-    mask_i = np.random.choice(indices,
-                              int(len(indices) * args.train_test_split),
-                              replace=False)
+    mask_i = np.random.choice(
+        indices, int(len(indices) * args.train_test_split), replace=False
+    )
     test_indices = [i for i in indices if i not in set(mask_i)]
     train_indices = [i for i in indices if i in set(mask_i)]
     train_rows = [rows[ti] for ti in train_indices]
@@ -51,19 +53,21 @@ def split_train_test(args, rows):
 
     return train_rows, test_rows
 
+
 def write2file(args, rows, filename):
-    with open(filename, 'w') as fp:
+    with open(filename, "w") as fp:
         for argi in vars(args):
-            fp.write('# {} {}\n'.format(argi, getattr(args, argi)))
+            fp.write("# {} {}\n".format(argi, getattr(args, argi)))
         writer = csv.writer(fp)
-        writer.writerow(['story','summary'])
+        writer.writerow(["story", "summary"])
         for row in rows:
             writer.writerow(row)
 
+
 def sanity_check(filename, rows):
     ## sanity check
-    df = pd.read_csv(filename, skip_blank_lines=True, comment='#')
-    print('Total rows : {}'.format(len(df)))
+    df = pd.read_csv(filename, skip_blank_lines=True, comment="#")
+    print("Total rows : {}".format(len(df)))
     assert len(rows) == len(df)
 
 
@@ -115,13 +119,15 @@ def comb_indexes(sn, max_seq_len=3):
     Idea here is to generate all combinations maintaining the order
     Eg, [a,b,c,d] => [[a],[b],[c],[d]], [[a,b],[c],[d]], [[a,b,c],[d]], etc ...
     where the max sequence is max_seq_len
+
+    ISSUE: this function can take a lot of time if the number of sentences is high.
     :param sn:
     :param max_seq_len:
     :return:
     """
     s_n = len(sn)
     cd = CDS()
-    some_comb = cd.combinationSum(list(range(1,max_seq_len+1)),s_n)
+    some_comb = cd.combinationSum(list(range(1, max_seq_len + 1)), s_n)
     all_comb = [list(perm_unique(x)) for x in some_comb]
     all_comb = [y for r in all_comb for y in r]
     pairs = []
@@ -129,10 +135,11 @@ def comb_indexes(sn, max_seq_len=3):
         rsa = []
         stt = 0
         for yt in pt:
-            rsa.append(sn[stt:stt+yt])
+            rsa.append(sn[stt : stt + yt])
             stt += yt
         pairs.append(rsa)
     return pairs
+
 
 def choose_random_subsequence(sn, max_seq_len=3):
     return random.choice(comb_indexes(sn, max_seq_len))

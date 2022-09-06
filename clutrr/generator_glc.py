@@ -193,6 +193,12 @@ def get_entity_gender_combination(data_row, edge_ids) -> Tuple[List[int], str]:
     return entities, ent_gender
 
 
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i : i + n]
+
+
 def sample_combination(
     args, data_row, templates, debug=False
 ) -> Tuple[List[str], List[List[int]]]:
@@ -211,54 +217,64 @@ def sample_combination(
     else:
         MAX_COMBINATION_NUMBER = 1
     edge_ids = list(range(len(data_row["edges"])))
-    edge_combinations = comb_indexes(edge_ids, MAX_COMBINATION_NUMBER)
-    # Convert edge combinations to - separated named relation types
-    named_rel_combinations = [
-        [
-            "-".join([data_row["named_edges"][eid][-1] for eid in group])
-            for group in comb
+    # To run this faster we batch the processing to chunks of 5
+    batch_edge_ids = chunks(edge_ids, 5)
+    final_combinations = []
+    edge_ids_groups = []
+    for edge_ids in batch_edge_ids:
+        edge_combinations = comb_indexes(edge_ids, MAX_COMBINATION_NUMBER)
+        # Convert edge combinations to - separated named relation types
+        named_rel_combinations = [
+            [
+                "-".join([data_row["named_edges"][eid][-1] for eid in group])
+                for group in comb
+            ]
+            for comb in edge_combinations
         ]
-        for comb in edge_combinations
-    ]
-    # Filter combinations are available in the template
-    filtered_combs = []
-    for gi, group in enumerate(named_rel_combinations):
-        present = True
-        for comb in group:
-            if comb not in templates:
-                present = False
-                break
-        if present:
-            filtered_combs.append((gi, group))
 
-    ## Further, filter combinations which has the correct gender ordering
-    gender_filtered_combs = []
-    for gi, group in filtered_combs:
-        present = True
-        for ci, comb in enumerate(group):
-            edge_ids = edge_combinations[gi][ci]
-            _, ent_gender = get_entity_gender_combination(data_row, edge_ids)
-            if ent_gender not in templates[comb]:
-                present = False
-                break
-        if present:
-            gender_filtered_combs.append((gi, group))
+        # Filter combinations are available in the template
+        filtered_combs = []
+        for gi, group in enumerate(named_rel_combinations):
+            present = True
+            for comb in group:
+                if comb not in templates:
+                    present = False
+                    break
+            if present:
+                filtered_combs.append((gi, group))
 
-    if debug:
-        print(f"Available combinations : {len(filtered_combs)}")
+        ## Further, filter combinations which has the correct gender ordering
+        gender_filtered_combs = []
+        for gi, group in filtered_combs:
+            present = True
+            for ci, comb in enumerate(group):
+                edge_ids = edge_combinations[gi][ci]
+                _, ent_gender = get_entity_gender_combination(data_row, edge_ids)
+                if ent_gender not in templates[comb]:
+                    present = False
+                    # TODO: It seems many gender configurations are missing from the templates
+                    # print(f"Need {ent_gender} in {comb}")
+                    break
+            if present:
+                gender_filtered_combs.append((gi, group))
 
-    # Choose a single combination
-    if len(gender_filtered_combs) > 0:
-        final_combination = random.choice(gender_filtered_combs)
-        gi, group = final_combination
-        edge_ids_group = edge_combinations[gi]
-        return final_combination, edge_ids_group
-    else:
-        print(filtered_combs)
-        print(gender_filtered_combs)
-        raise AssertionError(
-            "One or more templates are missing from the provided file."
-        )
+        # print(f"Available combinations : {len(filtered_combs)}")
+        # print(f"Available gender filtered combinations : {len(gender_filtered_combs)}")
+
+        # Choose a single combination
+        if len(gender_filtered_combs) > 0:
+            final_combination = random.choice(gender_filtered_combs)
+            gi, group = final_combination
+            edge_ids_group = edge_combinations[gi]
+            final_combinations.extend(final_combination[1])
+            edge_ids_groups.extend(edge_ids_group)
+        else:
+            # print(filtered_combs)
+            # print(gender_filtered_combs)
+            raise AssertionError(
+                "One or more templates are missing from the provided file."
+            )
+    return final_combinations, edge_ids_groups
 
 
 def apply_template_on_edges(
@@ -285,7 +301,7 @@ def apply_template_on_edges(
     )
     story = ""
     used_templates = []
-    for ci, comb in enumerate(final_combination[1]):
+    for ci, comb in enumerate(final_combination):
         entities, gender_str = get_entity_gender_combination(
             data_row, edge_ids_group[ci]
         )
@@ -321,13 +337,20 @@ def apply_templates(args, data_file, templates) -> List[Dict[str, Any]]:
     print("Applying language layer ...")
     pb = tqdm(total=len(data_file))
     for row in data_file:
-        new_row = copy.deepcopy(row)
-        new_row = apply_template_on_edges(
-            args, new_row, templates, name_boundary=args.use_name_boundary
-        )
-        new_rows.append(new_row)
+        try:
+            new_row = copy.deepcopy(row)
+            new_row = apply_template_on_edges(
+                args, new_row, templates, name_boundary=args.use_name_boundary
+            )
+            new_rows.append(new_row)
+        except:
+            pass
         pb.update(1)
     pb.close()
+    if len(data_file) != len(new_rows):
+        print(
+            f"Warning: due to unavailability of some templates, number of rows reduced from {len(data_file)} to {len(new_rows)}."
+        )
     print("Application complete!")
     return new_rows
 
