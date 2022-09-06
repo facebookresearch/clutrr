@@ -18,11 +18,37 @@ import os
 import json
 import pandas as pd
 import yaml
-from addict import Dict as aDict
 import copy
-from tqdm.auto import tqdm
+from tqdm.rich import tqdm
 
 from clutrr.utils.utils import comb_indexes
+import logging
+from rich.logging import RichHandler
+
+# Disable hydra internal loggings
+for _ in logging.root.manager.loggerDict:
+    logging.getLogger(_).setLevel(logging.CRITICAL)
+
+import warnings
+
+# Ignore hydra warnings
+warnings.filterwarnings("ignore")
+
+FORMAT = "%(message)s"
+logging.basicConfig(
+    level="NOTSET",
+    format=FORMAT,
+    datefmt="[%X]",
+    handlers=[RichHandler()],
+)
+
+log = logging.getLogger(__name__)
+
+from rich.console import Console
+
+console = Console()
+## Utility functions
+
 
 ## Utility functions
 
@@ -43,7 +69,7 @@ def dump_jsonl(data, output_path, append=False):
         for line in data:
             json_record = json.dumps(line, ensure_ascii=False)
             f.write(json_record + "\n")
-    print("Wrote {} records to {}".format(len(data), output_path))
+    log.info("Wrote {} records to {}".format(len(data), output_path))
 
 
 def load_jsonl(input_path) -> list:
@@ -54,7 +80,7 @@ def load_jsonl(input_path) -> list:
     with open(input_path, "r", encoding="utf-8") as f:
         for line in f:
             data.append(json.loads(line.rstrip("\n|\r")))
-    print("Loaded {} records from {}".format(len(data), input_path))
+    log.info("Loaded {} records from {}".format(len(data), input_path))
     return data
 
 
@@ -253,13 +279,13 @@ def sample_combination(
                 if ent_gender not in templates[comb]:
                     present = False
                     # TODO: It seems many gender configurations are missing from the templates
-                    # print(f"Need {ent_gender} in {comb}")
+                    # log.info(f"Need {ent_gender} in {comb}")
                     break
             if present:
                 gender_filtered_combs.append((gi, group))
 
-        # print(f"Available combinations : {len(filtered_combs)}")
-        # print(f"Available gender filtered combinations : {len(gender_filtered_combs)}")
+        # log.info(f"Available combinations : {len(filtered_combs)}")
+        # log.info(f"Available gender filtered combinations : {len(gender_filtered_combs)}")
 
         # Choose a single combination
         if len(gender_filtered_combs) > 0:
@@ -269,8 +295,8 @@ def sample_combination(
             final_combinations.extend(final_combination[1])
             edge_ids_groups.extend(edge_ids_group)
         else:
-            # print(filtered_combs)
-            # print(gender_filtered_combs)
+            # log.info(filtered_combs)
+            # log.info(gender_filtered_combs)
             raise AssertionError(
                 "One or more templates are missing from the provided file."
             )
@@ -334,7 +360,7 @@ def apply_templates(args, data_file, templates) -> List[Dict[str, Any]]:
     Apply the templator over the rows
     """
     new_rows = []
-    print("Applying language layer ...")
+    log.info("Applying language layer ...")
     pb = tqdm(total=len(data_file))
     for row in data_file:
         try:
@@ -348,10 +374,10 @@ def apply_templates(args, data_file, templates) -> List[Dict[str, Any]]:
         pb.update(1)
     pb.close()
     if len(data_file) != len(new_rows):
-        print(
-            f"Warning: due to unavailability of some templates, number of rows reduced from {len(data_file)} to {len(new_rows)}."
+        log.warn(
+            f"Due to unavailability of some templates, number of rows reduced from {len(data_file)} to {len(new_rows)}."
         )
-    print("Application complete!")
+    log.info("Application complete!")
     return new_rows
 
 
@@ -445,7 +471,7 @@ def validate_graphs(data_file):
         if found:
             continue
         cleaned_rows.append(row)
-    print(f"Cleaned rows from {len(data_file)} to {len(cleaned_rows)}")
+    log.info(f"Cleaned rows from {len(data_file)} to {len(cleaned_rows)}")
     return cleaned_rows
 
 
@@ -456,11 +482,11 @@ def save_graphs(args, train_file, valid_file, test_file) -> None:
     loc = (
         Path(args.data_loc) / "rule_0"
     )  # rule_0 is the default location for Clutrr specific data
-    print(f"Saving {len(train_file)} train records.")
+    log.info(f"Saving {len(train_file)} train records.")
     dump_jsonl(train_file, loc / "train.jsonl")
-    print(f"Saving {len(valid_file)} train records.")
+    log.info(f"Saving {len(valid_file)} train records.")
     dump_jsonl(valid_file, loc / "valid.jsonl")
-    print(f"Saving {len(test_file)} test records.")
+    log.info(f"Saving {len(test_file)} test records.")
     dump_jsonl(test_file, loc / "test.jsonl")
 
 
@@ -473,21 +499,23 @@ def subsample_graphs(
     if len(train_file) > args.num_train:
         train_file = random.sample(train_file, args.num_train)
     else:
-        print("Warning: not enough valid files. Please generate more graphs using GLC.")
+        log.warn("Not enough valid files. Please generate more graphs using GLC.")
     if len(valid_file) > args.num_valid:
         valid_file = random.sample(valid_file, args.num_valid)
     else:
-        print("Warning: not enough train files. Please generate more graphs using GLC.")
+        log.warn("Not enough train files. Please generate more graphs using GLC.")
     if len(test_file) > args.num_test:
         test_file = random.sample(test_file, args.num_test)
     else:
-        print("Warning: not enough test files. Please generate more graphs using GLC.")
+        log.warn("Not enough test files. Please generate more graphs using GLC.")
     return train_file, valid_file, test_file
 
 
-@hydra.main(config_name="config")
+@hydra.main(config_name="config", version_base="1.1")
 def main(args: DictConfig):
     set_seed(args.seed)
+    console.rule("CLUTRR - Language Layer Applicator")
+    console.print(args)
     # Load files
     train_file, valid_file, test_file = load_graphs(args)
     # validate graphs
@@ -505,9 +533,9 @@ def main(args: DictConfig):
         args, train_file, valid_file, test_file
     )
     ## Save files
-    print("Saving files ...")
+    log.info("Saving files ...")
     save_graphs(args, train_file, valid_file, test_file)
-    print("Done.")
+    log.info("Done.")
 
 
 if __name__ == "__main__":
