@@ -63,14 +63,14 @@ Each row of the output contains the following fields:
 
 ## ChangeLog
 
-## v1.3.0
+### v1.3.0
 
 - Fixes for incorrect AMT templates (#15). Templates are now screened by a relation extraction model, and `is_correct` flag added to the data which indicates correct (`True`) and logically incorrect (`False`) templates.
 - Added ability in the template loader to ignore incorrect templates: `template_amt.ignore_incorrect: True` in [config](clutrr/config.yaml).
 - Added ability to load alternate template files by specifying in the config (`template_amt.{train/valid/test}_file` in [config](clutrr/config.yaml))
 - Minor fixes to tests, added more requirements 
 
-## v1.2.0
+### v1.2.0
 
 - Added support for noises (`supporting`, `disconnected` and `dangling`) from GLC
 - Converted AMT templates to csv for better viewing / moderation. You can now skip a template by setting `ignore` field to `True`.
