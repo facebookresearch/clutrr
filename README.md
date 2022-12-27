@@ -29,7 +29,7 @@ Finally, install the `clutrr` module.
 
 `python setup.py develop`
 
-**Note**: Currently, CLUTRR is being updated to integrate [GLC](https://github.com/koustuvsinha/glc) in the develop branch (#9). For the original full readme, please switch to the main branch.
+**Note**: For the original full readme of v1.0, please switch to the main branch.
 
 ## Usage
 
