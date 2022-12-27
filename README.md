@@ -65,7 +65,7 @@ Each row of the output contains the following fields:
 
 ### v1.3.0
 
-- Fixes for incorrect AMT templates (#15). Templates are now screened by a relation extraction model, and `is_correct` flag added to the data which indicates correct (`True`) and logically incorrect (`False`) templates.
+- Fixes for incorrect AMT templates ([#15](https://github.com/facebookresearch/clutrr/issues/15)). Templates are now screened by a relation extraction model, and `is_correct` flag added to the data which indicates correct (`True`) and logically incorrect (`False`) templates.
 - Added ability in the template loader to ignore incorrect templates: `template_amt.ignore_incorrect: True` in [config](clutrr/config.yaml).
 - Added ability to load alternate template files by specifying in the config (`template_amt.{train/valid/test}_file` in [config](clutrr/config.yaml))
 - Minor fixes to tests, added more requirements 
