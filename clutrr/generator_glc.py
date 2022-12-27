@@ -226,7 +226,11 @@ def chunks(lst, n):
 
 
 def sample_combination(
-    args, data_row, templates, debug=False
+    args,
+    data_row,
+    templates,
+    debug=False,
+    split="train",
 ) -> Tuple[List[str], List[List[int]]]:
     """
     Select the edges to combine, and then apply template on top of it
@@ -234,7 +238,7 @@ def sample_combination(
     as : [1,1,1,1] (each edge on its own) to [3,1] (three edge combined, with 1 remaining)
     Function defined in `comb_indexes` in utils/utils.py
 
-    :Return:
+        :Return:
         - final_combination : [father, mother, son, father]
         - edge_ids_group: [[1],[2],[3],[4]]
     """
@@ -242,6 +246,7 @@ def sample_combination(
         MAX_COMBINATION_NUMBER = 3  # CLUTRR only supports 3 for now in AMT. For more support, collect more templates!
     else:
         MAX_COMBINATION_NUMBER = 1
+    templates = copy.copy(templates[split])
     edge_ids = list(range(len(data_row["edges"])))
     # To run this faster we batch the processing to chunks of 5
     batch_edge_ids = chunks(edge_ids, 5)
@@ -304,7 +309,13 @@ def sample_combination(
 
 
 def apply_template_on_edges(
-    args, data_row, templates, separator=" ", name_boundary=False, debug=False
+    args,
+    data_row,
+    templates,
+    separator=" ",
+    name_boundary=False,
+    debug=False,
+    split="train",
 ) -> Dict[str, Any]:
     """
     Apply templates on the edges
@@ -316,6 +327,7 @@ def apply_template_on_edges(
     - separator: Sentence separator
     - name_boundary: whether to add a "[]" boundary surrounding the names
     - debug: Inspect method
+    - split: which split the templates should be chosen from (train/valid/test)
 
 
     :Return: modified data_row
@@ -323,7 +335,7 @@ def apply_template_on_edges(
     data_row = apply_gender(args, data_row)
     data_row = assign_names(args, data_row)
     final_combination, edge_ids_group = sample_combination(
-        args, data_row, templates, debug
+        args, data_row, templates, debug, split=split
     )
     story = ""
     used_templates = []
@@ -333,7 +345,7 @@ def apply_template_on_edges(
         )
         named_entities = [data_row["name_map"][e] for e in entities]
         gender_of_entities = [data_row["gender_map"][e] for e in entities]
-        chosen_template = random.choice(templates[comb][gender_str])
+        chosen_template = random.choice(templates[split][comb][gender_str])
         fact = copy.deepcopy(chosen_template)
         # save used templates for posterity
         used_templates.append((chosen_template, named_entities, gender_of_entities))
@@ -350,7 +362,7 @@ def apply_template_on_edges(
     return data_row
 
 
-def apply_templates(args, data_file, templates) -> List[Dict[str, Any]]:
+def apply_templates(args, data_file, templates, split) -> List[Dict[str, Any]]:
     """
 
     data_file: consists of rows of json, with the following keys:
@@ -366,7 +378,11 @@ def apply_templates(args, data_file, templates) -> List[Dict[str, Any]]:
         try:
             new_row = copy.deepcopy(row)
             new_row = apply_template_on_edges(
-                args, new_row, templates, name_boundary=args.use_name_boundary
+                args,
+                new_row,
+                templates,
+                name_boundary=args.use_name_boundary,
+                split=split,
             )
             new_rows.append(new_row)
         except:
@@ -381,19 +397,27 @@ def apply_templates(args, data_file, templates) -> List[Dict[str, Any]]:
     return new_rows
 
 
-def load_csv_templates(loc) -> Dict[str, Any]:
+def load_csv_templates(loc, ignore_incorrect=False) -> Dict[str, Any]:
     """
     Load csv templates and convert them to dict
     """
+    print(f"Loading templates from {loc}...")
     df = pd.read_csv(loc)
     template_store = {}
+    dropped = 0
     for i, row in df.iterrows():
+        if ignore_incorrect:
+            if not row["is_correct"]:
+                dropped += 1
+                continue
         if row["rel_comb"] not in template_store:
             template_store[row["rel_comb"]] = {}
         if row["gender_comb"] not in template_store[row["rel_comb"]]:
             template_store[row["rel_comb"]][row["gender_comb"]] = []
         if not row["ignore"]:
             template_store[row["rel_comb"]][row["gender_comb"]].append(row["template"])
+    if dropped > 0:
+        print(f"Dropped {dropped} templates because ignore_incorrect flag is set.")
     return template_store
 
 
@@ -403,16 +427,28 @@ def load_templates(args) -> Dict[str, Any]:
     """
     templates = {"train": {}, "valid": {}, "test": {}}
     cur_folder = get_current_folder()
+    synthetic_templates = json.load(
+        open(cur_folder / args.template_folder / "synthetic" / "train.json")
+    )
     template_dir = cur_folder / args.template_folder / args.template_type
     if args.template_type == "synthetic":
-        tp = json.load(open(template_dir / "train.json"))
-        templates["train"] = tp
-        templates["valid"] = tp
-        templates["test"] = tp
+        templates["train"] = synthetic_templates
+        templates["valid"] = synthetic_templates
+        templates["test"] = synthetic_templates
     elif args.template_type == "amt":
-        templates["train"] = load_csv_templates(template_dir / "train.csv")
-        templates["valid"] = load_csv_templates(template_dir / "valid.csv")
-        templates["test"] = load_csv_templates(template_dir / "test.csv")
+        templates["train"] = load_csv_templates(
+            template_dir / args.template_amt.train_file,
+            ignore_incorrect=args.template_amt.ignore_incorrect,
+        )
+        templates["valid"] = load_csv_templates(
+            template_dir / args.template_amt.valid_file,
+            ignore_incorrect=args.template_amt.ignore_incorrect,
+        )
+        templates["test"] = load_csv_templates(
+            template_dir / args.template_amt.test_file,
+            ignore_incorrect=args.template_amt.ignore_incorrect,
+        )
+        templates["synthetic"] = synthetic_templates
     else:
         raise AssertionError(f"template_type : {args.template_type} not supported")
     return templates
@@ -525,9 +561,9 @@ def main(args: DictConfig):
     ## Load templates
     templates = load_templates(args)
     ## Apply templates per file
-    train_file = apply_templates(args, train_file, templates["train"])
-    valid_file = apply_templates(args, valid_file, templates["valid"])
-    test_file = apply_templates(args, test_file, templates["test"])
+    train_file = apply_templates(args, train_file, templates, "train")
+    valid_file = apply_templates(args, valid_file, templates, "valid")
+    test_file = apply_templates(args, test_file, templates, "test")
     # Subsample
     train_file, valid_file, test_file = subsample_graphs(
         args, train_file, valid_file, test_file

@@ -3,6 +3,9 @@ DATA_LOC=graphs
 NUM_TRAIN=10
 NUM_VALID=10
 NUM_TEST=10
+# Note: use this search multiplier to ensure enough graphs are sampled to meet
+# NUM_TRAIN, NUM_VALID and NUM_TEST requirements.
+SEARCH_MULTIPLIER=5
 TEMPLATE_TYPE=amt # or synthetic
 NOISE=true
 NOISE_POLICY=dangling
@@ -15,9 +18,9 @@ TEST_DESCRIPTOR_LENGTHS=\'3,4\'
 python glc/glc.py save_loc=$DATA_LOC \
     rule_store=glc/rule_bases/clutrr \
     world_prefix=rule \
-    num_train_graphs=$((NUM_TRAIN*2)) \
-    num_valid_graphs=$((NUM_VALID*2)) \
-    num_test_graphs=$((NUM_TEST*2)) \
+    num_train_graphs=$((NUM_TRAIN * SEARCH_MULTIPLIER)) \
+    num_valid_graphs=$((NUM_VALID * SEARCH_MULTIPLIER)) \
+    num_test_graphs=$((NUM_TEST * SEARCH_MULTIPLIER)) \
     train_descriptor_lengths=$TRAIN_DESCRIPTOR_LENGTHS \
     val_descriptor_lengths=$VAL_DESCRIPTOR_LENGTHS \
     test_descriptor_lengths=$TEST_DESCRIPTOR_LENGTHS \

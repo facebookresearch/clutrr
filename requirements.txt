@@ -1,10 +1,12 @@
-pandas==0.23.4
+pandas
 names==0.3.0
-tqdm==4.28.1
-hydra-core==1.0.0
+tqdm
+hydra-core==1.3.0
 sacremoses
 PyYAML
 networkx
 matplotlib
 nltk
 requests
+rich
+addict

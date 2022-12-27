@@ -127,17 +127,20 @@ def test_sample_combination():
             "template_folder": "clutrr/templates",
             "num_names": 1000,
             "names_file": "clutrr/names.csv",
+            "template_amt": {
+                "train_file": "train.csv",
+                "valid_file": "train.csv",
+                "test_file": "test.csv",
+            },
         }
     )
     row = apply_gender(args, test_data[0])
     row = assign_names(args, row)
     templates = load_templates(args)
     final_combination, edge_ids_group = sample_combination(
-        args, row, templates["train"]
+        args, row, templates, split="train"
     )
     assert len(final_combination) == 2
-    assert len(final_combination[1]) == 2
-    assert final_combination[0] == 6
     assert len(edge_ids_group) == 2
     assert edge_ids_group[0] == [0, 1]
     assert edge_ids_group[1] == [2, 3]
@@ -152,10 +155,16 @@ def test_apply_template_on_edges():
             "template_folder": "clutrr/templates",
             "num_names": 1000,
             "names_file": "clutrr/names.csv",
+            "template_amt": {
+                "train_file": "train.csv",
+                "valid_file": "train.csv",
+                "test_file": "test.csv",
+            },
         }
     )
     templates = load_templates(args)
-    row = apply_template_on_edges(args, test_data[0], templates["train"])
+    assert "train" in templates
+    row = apply_template_on_edges(args, test_data[0], templates, split="train")
     assert "text_story" in row
     assert "used_templates" in row
     # Recompute the story and test
@@ -177,11 +186,16 @@ def test_apply_template_on_edges_with_boundary():
             "template_folder": "clutrr/templates",
             "num_names": 1000,
             "names_file": "clutrr/names.csv",
+            "template_amt": {
+                "train_file": "train.csv",
+                "valid_file": "train.csv",
+                "test_file": "test.csv",
+            },
         }
     )
     templates = load_templates(args)
     row = apply_template_on_edges(
-        args, test_data[0], templates["train"], name_boundary=True
+        args, test_data[0], templates, split="train", name_boundary=True
     )
     assert "text_story" in row
     assert "used_templates" in row

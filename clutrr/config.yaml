@@ -11,6 +11,11 @@ num_train: 500
 num_valid: 50
 num_test: 50
 use_name_boundary: True # adds a [ ] boundary surrounding the name
+template_amt:
+  train_file: train_text-davinci-003_v1.3.csv
+  valid_file: train_text-davinci-003_v1.3.csv
+  test_file: test_text-davinci-003_v1.3.csv
+  ignore_incorrect: True
 hydra:
   job:
     chdir: False
