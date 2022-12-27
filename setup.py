@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="clutrr",
-    version="1.2.0",
+    version="1.3.0",
     description="Compositional Language Understanding with Text-based Relational Reasoning",
     packages=find_packages(exclude=("data", "mturk")),
     include_package_data=True,

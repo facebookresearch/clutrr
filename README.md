@@ -17,7 +17,15 @@ Code for generating data for our paper ["CLUTRR: A Diagnostic Benchmark for Indu
 
 ## Install
 
+Ensure the GLC submodule is cloned:
+
+`git submodule update --init --recursive`
+
+Then, install the dependencies:
+
 `pip install -r requirements.txt`
+
+Finally, install the `clutrr` module.
 
 `python setup.py develop`
 
@@ -55,6 +63,13 @@ Each row of the output contains the following fields:
 
 ## ChangeLog
 
+## v1.3.0
+
+- Fixes for incorrect AMT templates (#15). Templates are now screened by a relation extraction model, and `is_correct` flag added to the data which indicates correct (`True`) and logically incorrect (`False`) templates.
+- Added ability in the template loader to ignore incorrect templates: `template_amt.ignore_incorrect: True` in [config](clutrr/config.yaml).
+- Added ability to load alternate template files by specifying in the config (`template_amt.{train/valid/test}_file` in [config](clutrr/config.yaml))
+- Minor fixes to tests, added more requirements 
+
 ## v1.2.0
 
 - Added support for noises (`supporting`, `disconnected` and `dangling`) from GLC
@@ -74,7 +89,7 @@ Each row of the output contains the following fields:
 
 ## Tests
 
-Run the tests using `pytest`:
+Install `pytest` (`pip install pytest`) and run the tests:
 
 ```sh
 pytest clutrr
@@ -96,7 +111,7 @@ If our work is useful for your research, consider citing it using the following 
 
 ## Join the CLUTRR community
 
-- Website: https://www.cs.mcgill.ca/~ksinha4/clutrr/
+- Website: https://koustuvsinha.com/project/clutrr/
 
 See the [CONTRIBUTING](CONTRIBUTING.md) file for how to help out.
 
